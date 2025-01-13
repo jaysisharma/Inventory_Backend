@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customer Service Form</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.0.3/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50 p-6">
+  <div class="w-full max-w-4xl bg-white p-8 rounded-lg shadow-lg">
+    <h2 class="text-2xl font-bold mb-6 text-gray-800">Customer Service Form</h2>
+    <form action="/submit" method="POST" enctype="multipart/form-data">
+      <div class="bg-gray-100 p-6 rounded-md shadow-sm">
+        <h3 class="text-lg font-semibold text-gray-700">Customer Information</h3>
+        <!-- Customer Details -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-4">
+          <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700">Customer's Name:</label>
+            <input type="text" name="customerName" value="<%= customerName %>" class="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" placeholder="Enter customer's name" />
+          </div>
+
+          <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700">Contact No.:</label>
+            <input type="text" name="contactNo" value="<%= contactNo %>" class="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" placeholder="Enter contact number" />
+          </div>
+        </div>
+
+        <div class="mt-4 space-y-2">
+          <label class="block text-sm font-medium text-gray-700">Total Items:</label>
+          <input type="number" name="totalItems" value="<%= totalItems %>" class="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" placeholder="Enter total items" />
+        </div>
+
+        <!-- Receiver Name -->
+        <div class="mt-4 space-y-2">
+          <label class="block text-sm font-medium text-gray-700">Receiver Name:</label>
+          <input type="text" name="receiverName" value="<%= receiverName %>" class="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" placeholder="Enter receiver's name" />
+        </div>
+      </div>
+
+      <!-- Dynamic Product Fields -->
+      <% for (let i = 0; i < totalItems; i++) { %>
+        <div class="bg-gray-50 p-6 rounded-md shadow-md space-y-6 mt-6">
+          <h4 class="text-lg font-semibold text-gray-700">Product <%= i + 1 %></h4>
+
+          <!-- Product Type Dropdown -->
+          <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700">Product Type:</label>
+            <select name="products[<%= i %>].productType" class="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+              <option value="camera" <%= products[i].productType === 'camera' ? 'selected' : '' %>>Camera</option>
+              <option value="drone" <%= products[i].productType === 'drone' ? 'selected' : '' %>>Drone</option>
+              <option value="led" <%= products[i].productType === 'led' ? 'selected' : '' %>>LED</option>
+              <option value="other" <%= products[i].productType === 'other' ? 'selected' : '' %>>Other</option>
+            </select>
+          </div>
+
+          <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700">Model No.:</label>
+            <input type="text" name="products[<%= i %>].modelNo" value="<%= products[i].modelNo %>" class="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" placeholder="Enter model number" />
+          </div>
+
+          <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700">Serial No.:</label>
+            <input type="text" name="products[<%= i %>].serialNo" value="<%= products[i].serialNo %>" class="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" placeholder="Enter serial number" />
+          </div>
+
+          <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700">Problem:</label>
+            <textarea name="products[<%= i %>].problem" class="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" placeholder="Describe the problem"><%= products[i].problem %></textarea>
+          </div>
+
+          <!-- Image Upload -->
+          <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700">Upload Images:</label>
+            <input type="file" name="products[<%= i %>].images" accept="image/*" class="w-full p-3 border border-gray-300 rounded-md shadow-sm" />
+
+            <!-- Display Uploaded Images -->
+            <% if (products[i].images && products[i].images.length > 0) { %>
+              <div class="mt-2 grid grid-cols-2 gap-4">
+                <% products[i].images.forEach(function(image, idx) { %>
+                  <img src="<%= image %>" alt="Uploaded Image <%= idx + 1 %>" class="w-full h-auto rounded-md" />
+                <% }); %>
+              </div>
+            <% } %>
+          </div>
+
+          <!-- Accessory Selection -->
+          <% if (products[i].productType) { %>
+            <div class="mt-4">
+              <h5 class="text-sm font-medium text-gray-700">Select Accessories:</h5>
+              <div class="space-y-4">
+                <% let accessoriesList = accessories[products[i].productType] || []; %>
+                <% accessoriesList.forEach(function(accessory) { %>
+                  <div class="flex items-center space-x-4">
+                    <input type="checkbox" name="products[<%= i %>].selectedAccessories" value="<%= accessory %>" <%= (products[i].selectedAccessories || []).includes(accessory) ? 'checked' : '' %> class="h-4 w-4 text-blue-500" />
+                    <label class="text-sm"><%= accessory %></label>
+
+                    <!-- Description Input -->
+                    <% if ((products[i].selectedAccessories || []).includes(accessory)) { %>
+                      <input type="text" name="products[<%= i %>].accessoryDescriptions[<%= accessory %>]" value="<%= products[i].accessoryDescriptions[accessory] || '' %>" class="ml-2 p-2 w-2/3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" placeholder="Enter description" />
+                    <% } %>
+                  </div>
+                <% }); %>
+              </div>
+            </div>
+          <% } %>
+
+        </div>
+      <% } %>
+
+      <!-- Delivery Details -->
+      <div class="bg-gray-100 p-6 rounded-md shadow-sm mt-6">
+        <h3 class="text-lg font-semibold text-gray-700">Delivery Details</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-4">
+          <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700">Delivery Date:</label>
+            <input type="date" name="expected_delivery_date" value="<%= expected_delivery_date %>" class="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" />
+          </div>
+        </div>
+
+        <div class="space-y-2 mt-4">
+          <label class="block text-sm font-medium text-gray-700">Expectation Amount:</label>
+          <input type="text" name="expectationAmount" value="<%= expectationAmount %>" class="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500" placeholder="Enter expected amount" />
+        </div>
+      </div>
+
+      <div class="flex justify-end mt-8">
+        <button type="submit" class="px-6 py-3 rounded-md bg-blue-500 hover:bg-blue-600 text-white">
+          Submit
+        </button>
+      </div>
+    </form>
+  </div>
+</body>
+</html>
