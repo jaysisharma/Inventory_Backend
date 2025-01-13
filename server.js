@@ -18,8 +18,7 @@ import secondHandProductRouter from './routes/secondHandProductRoutes.js';
 import cors from 'cors';
 // Initialize App
 const app = express();
-// app.use(cors());
-app.use(cors({ origin: 'https://mediumvioletred-buffalo-504320.hostingersite.com/' }));
+app.use(cors());
 
 app.use(bodyParser.json());
 dotenv.config();
